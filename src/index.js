@@ -36,7 +36,7 @@ const Exceeds = props => {
         const minute = date.getMinutes();
         const actions = data.actions;
 
-        var i = 0;
+        let i = 0;
         while (i < actions.length && actions[i].minute <= minute) i++;
 
         const current = 0 <= i - 1 && i - 1 < actions.length ? actions[i - 1] : undefined;
