@@ -14,11 +14,14 @@ const NextAction = props => {
     const text = (() => {
         if (action) {
             const { name, minute } = action;
+            const second = action.second ? action.second : 0;
             const m = date.getMinutes();
             const s = date.getSeconds();
-            const restMinute = minute - m - (s == 0 ? 0 : 1);
-            const restSeconds = s == 0 ? 0 : 60 - s;
-            return minute + "分 " + name + " (" + restMinute + ":" + ("0" + restSeconds).slice(-2) + ")"
+
+            const restTotalSeconds = (minute * 60 + second) - (m * 60 + s);
+            const restMinute = Math.floor(restTotalSeconds / 60);
+            const restSeconds = restTotalSeconds % 60;
+            return minute + "分" + (second != 0 ? (second + "秒 ") : " ") + name + " (" + restMinute + ":" + ("0" + restSeconds).slice(-2) + ")"
         } else {
             return "";
         }
@@ -34,10 +37,15 @@ const Exceeds = props => {
 
     const extract = (data, date) => {
         const minute = date.getMinutes();
+        const second = date.getSeconds();
         const actions = data.actions;
 
         let i = 0;
-        while (i < actions.length && actions[i].minute <= minute) i++;
+        for(; i < actions.length; i++) {
+            const m = actions[i].minute;
+            const s = actions[i].second ? actions[i].second : 0;
+            if(minute * 60 + second < m * 60 + s) break;
+        }
 
         const current = 0 <= i - 1 && i - 1 < actions.length ? actions[i - 1] : undefined;
         const next = 0 <= i && i < actions.length ? actions[i] : undefined;
